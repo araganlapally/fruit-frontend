@@ -1,14 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Container, Row, Col, Card, Button, Spinner } from 'react-bootstrap';
 
 const ProductList = ({ addToCart }) => {
   const [fruits, setFruits] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  const API_BASE = process.env.REACT_APP_API_URL;
+
   useEffect(() => {
     axios
-      .get('http://18.60.39.246:8080/fruits/') // <-- EC2 backend URL
+      .get(`${API_BASE}/fruits/`)
       .then((res) => {
         setFruits(res.data);
         setLoading(false);
@@ -20,42 +23,44 @@ const ProductList = ({ addToCart }) => {
       });
   }, []);
 
-  if (loading) return <p>Loading products...</p>;
+  if (loading) return (
+    <Container className="d-flex justify-content-center align-items-center min-vh-100">
+      <Spinner animation="border" />
+    </Container>
+  );
+
   if (error) return <p>{error}</p>;
 
   return (
-    <div className="container my-5">
+    <Container className="my-5">
       <h1 className="text-center mb-4">Available Fruits</h1>
-      <div className="row">
+      <Row>
         {fruits.map((fruit) => (
-          <div key={fruit.id} className="col-md-4 mb-4">
-            <div className="card h-100">
+          <Col key={fruit.id} md={4} className="mb-4">
+            <Card className="h-100">
               {fruit.imageurl && (
-                <img
+                <Card.Img
+                  variant="top"
                   src={fruit.imageurl}
                   alt={fruit.name}
-                  className="card-img-top"
                   style={{ height: '200px', objectFit: 'cover' }}
                 />
               )}
-              <div className="card-body">
-                <h5 className="card-title">{fruit.name}</h5>
-                <p className="card-text">{fruit.description}</p>
-                <p className="text-muted">Price: ₹{fruit.price}</p>
-              </div>
-              <div className="card-footer text-center">
-                <button
-                  onClick={() => addToCart(fruit)}
-                  className="btn btn-primary w-100"
-                >
-                  Add to Cart
-                </button>
-              </div>
-            </div>
-          </div>
+              <Card.Body className="d-flex flex-column">
+                <Card.Title>{fruit.name}</Card.Title>
+                <Card.Text>{fruit.description}</Card.Text>
+                <p className="text-muted">₹{fruit.price}</p>
+                <div className="mt-auto">
+                  <Button variant="primary" className="w-100" onClick={() => addToCart(fruit)}>
+                    Add to Cart
+                  </Button>
+                </div>
+              </Card.Body>
+            </Card>
+          </Col>
         ))}
-      </div>
-    </div>
+      </Row>
+    </Container>
   );
 };
 

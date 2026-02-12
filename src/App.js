@@ -24,17 +24,12 @@ function App() {
     });
   };
 
-  const removeFromCart = (id) => {
-    setCart(cart.filter((item) => item.id !== id));
-  };
-
+  const removeFromCart = (id) => setCart(cart.filter((item) => item.id !== id));
   const updateQuantity = (id, quantity) => {
     if (quantity < 1) return;
     setCart(cart.map((item) => (item.id === id ? { ...item, quantity } : item)));
   };
-
   const clearCart = () => setCart([]);
-
   const handleLoginSuccess = () => setIsAuthenticated(true);
   const handleLogout = () => setIsAuthenticated(false);
 
@@ -53,20 +48,8 @@ function App() {
               )
             }
           />
-          <Route
-            path="/cart"
-            element={
-              <Cart
-                cart={cart}
-                updateQuantity={updateQuantity}
-                removeFromCart={removeFromCart}
-              />
-            }
-          />
-          <Route
-            path="/checkout"
-            element={<Checkout cart={cart} clearCart={clearCart} />}
-          />
+          <Route path="/cart" element={<Cart cart={cart} updateQuantity={updateQuantity} removeFromCart={removeFromCart} />} />
+          <Route path="/checkout" element={<Checkout cart={cart} clearCart={clearCart} />} />
         </Routes>
       </Container>
     </Router>

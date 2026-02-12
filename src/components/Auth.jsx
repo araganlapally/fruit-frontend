@@ -1,47 +1,34 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Button, Form, Container, Card, Alert } from 'react-bootstrap';
 
 const Auth = ({ onLogin }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
 
-  const API_BASE = 'http://18.60.39.246:8080'; // <-- EC2 backend
+  // Hard-coded credentials
+  const HARDCODED_USERNAME = 'admin';
+  const HARDCODED_PASSWORD = 'admin123';
 
   const handleLogin = (e) => {
     e.preventDefault();
-    axios
-      .post(`${API_BASE}/login`, { username, password })
-      .then((res) => {
-        if (res.status === 200) {
-          alert('Login successful!');
-          onLogin();
-          navigate('/');
-        }
-      })
-      .catch((err) => {
-        if (err.response && err.response.status === 401) {
-          setErrorMessage('Invalid credentials!');
-        } else {
-          setErrorMessage('Login failed!');
-        }
-      });
+    if (username === HARDCODED_USERNAME && password === HARDCODED_PASSWORD) {
+      alert('Login successful!');
+      onLogin();
+      navigate('/');
+    } else {
+      setErrorMessage('Invalid credentials!');
+    }
   };
 
   const handleRegister = (e) => {
     e.preventDefault();
-    axios
-      .post(`${API_BASE}/register`, { username, email, password })
-      .then(() => {
-        alert('Registration successful!');
-        setIsLogin(true);
-      })
-      .catch(() => setErrorMessage('Registration failed!'));
+    // Skip actual registration; just show success
+    alert('Registration successful!');
+    setIsLogin(true);
   };
 
   return (
@@ -61,19 +48,21 @@ const Auth = ({ onLogin }) => {
                 required
               />
             </Form.Group>
-            {!isLogin && (
-              <Form.Group controlId="formEmail" className="mb-3">
-                <Form.Label>Email</Form.Label>
+
+            { !isLogin && (
+              <Form.Group controlId="formPassword" className="mb-3">
+                <Form.Label>Password</Form.Label>
                 <Form.Control
-                  type="email"
-                  placeholder="Enter email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  type="password"
+                  placeholder="Enter password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   required
                 />
               </Form.Group>
             )}
-            <Form.Group controlId="formPassword" className="mb-3">
+
+            <Form.Group controlId="formPasswordLogin" className="mb-3">
               <Form.Label>Password</Form.Label>
               <Form.Control
                 type="password"
@@ -83,10 +72,12 @@ const Auth = ({ onLogin }) => {
                 required
               />
             </Form.Group>
+
             <Button variant="primary" type="submit" className="w-100">
               {isLogin ? 'Login' : 'Register'}
             </Button>
           </Form>
+
           <div className="text-center mt-3">
             <Button variant="link" onClick={() => setIsLogin(!isLogin)}>
               {isLogin ? 'Need an account? Register' : 'Already have an account? Login'}
