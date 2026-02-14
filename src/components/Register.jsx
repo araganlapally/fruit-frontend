@@ -1,45 +1,84 @@
 import React, { useState } from "react";
+import API from "../services/api";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import AuthLayout from "./AuthLayout";
 
-const Register = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
+function Register() {
+
+  const [form, setForm] = useState({
+    username: "",
+    email: "",
+    password: ""
+  });
+
   const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
   const handleRegister = async (e) => {
     e.preventDefault();
+
     try {
-      const response = await axios.post("http://localhost:8080/register", { username, password });
-      setMessage("Registration successful! Redirecting to login...");
-      setTimeout(() => navigate("/login"), 2000); // Redirect after success
-    } catch (err) {
-      setMessage("Registration failed. Please try again.");
+      await API.post("/register", form);
+      alert("Registration successful!");
+      navigate("/");
+    } catch {
+      alert("Registration failed!");
     }
   };
 
   return (
-    <div>
-      <h2>Register</h2>
-      <form onSubmit={handleRegister}>
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <button type="submit">Register</button>
-      </form>
-      {message && <p>{message}</p>}
-    </div>
+    <AuthLayout>
+
+      <div className="card shadow p-4" style={{ width: "380px" }}>
+        <h4 className="mb-4 text-center">Create Account</h4>
+
+        <form onSubmit={handleRegister}>
+
+          <div className="mb-3">
+            <label className="form-label fw-bold">Username</label>
+            <input
+              className="form-control"
+              name="username"
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="mb-3">
+            <label className="form-label fw-bold">Email</label>
+            <input
+              type="email"
+              className="form-control"
+              name="email"
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="mb-3">
+            <label className="form-label fw-bold">Password</label>
+            <input
+              type="password"
+              className="form-control"
+              name="password"
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <button className="btn btn-warning w-100 fw-bold">
+            Create Account
+          </button>
+
+        </form>
+
+      </div>
+
+    </AuthLayout>
   );
-};
+}
 
 export default Register;
